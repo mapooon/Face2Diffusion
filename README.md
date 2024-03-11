@@ -12,16 +12,17 @@ The official PyTorch implementation for the following paper:
 
 # Recomended Development Environment
 * GPU: NVIDIA A100
-* CUDA: 11.4
+* CUDA: 12.2
+* Docker: 535.129.03
 
 
 # Setup
 ## 1. Build Docker Image
 Build a docker image
 ```bash
-docker build -t face2diffusion
+docker build -t face2diffusion dockerfiles/
 ```
-Execute docker 
+Execute docker using the following command (Please replace `/path/to/this/repository` with a proper one)
 ```bash
 docker run -it --gpus all --shm-size 512G \
 -v /path/to/this/repository:/workspace \
@@ -31,6 +32,11 @@ Install some packages
 ```bash
 bash install.sh
 ```
+Overwrite a file for Face2Diffusion's pipeline
+```bash
+cp /workspace/src/modified_scripts/modeling_clip.py /opt/conda/lib/python3.10/site-packages/transformers/models/clip/
+```
+
 ## 2. Download checkpoints
 We provide checkpoints for [mapping network](https://drive.google.com/file/d/1Lf_mwMgme_HVYJCkViGr4TfGOfKw9PhE/view?usp=sharing) and MSID encoder (Coming soon!) and place them to ```checkpoints/```.
 
