@@ -8,7 +8,8 @@ The official PyTorch implementation for the following paper:
 > *CVPR 2024*
 
 # Changelog
-2024/03/11: Released this repository and demo code.
+2024/03/15: Released the full inference pipeline.  
+2024/03/11: Released this repository and demo code.  
 
 # Recomended Development Environment
 * GPU: NVIDIA A100
@@ -38,21 +39,24 @@ cp /workspace/src/modified_scripts/modeling_clip.py /opt/conda/lib/python3.10/si
 ```
 
 ## 2. Download checkpoints
-We provide checkpoints for [mapping network](https://drive.google.com/file/d/1Lf_mwMgme_HVYJCkViGr4TfGOfKw9PhE/view?usp=sharing) and MSID encoder (Coming soon!) and place them to ```checkpoints/```.
+We provide checkpoints for [mapping network](https://drive.google.com/file/d/1Lf_mwMgme_HVYJCkViGr4TfGOfKw9PhE/view?usp=sharing) and [MSID encoder](https://drive.google.com/file/d/1DjUf-ib612SDDt86TRlsDkHqXTeYx030/view?usp=sharing) and place them to ```checkpoints/```.
 
 # Demo
-Currently, we provide pre-computed identity features from the MSID encoder. The extracted features and the original images can be seen in `./input/` folder. Here is an example to generate images:
+Generate images for an facial image and text prompt:
 ```bash
 python3 inference_f2d.py \
--w checkpoints/mapping.pt \
--i input/0.npy \ # input identity
+--w_map checkpoints/mapping.pt \
+--w_msid checkpoints/msid.pt \
+-i input/0.jpg \ # input identity
 -p 'f l eating bread in front of the Eiffel Tower' \ # input prompt
 -o output.png \ # output file name
 -n 8 \ # num of images to generate
 ```
 Note: The identifier S* should be represented as "f l".
 
-Full pipeline is coming soon!
+# Acknowledgements
+We borrow some code from [InsightFace](https://github.com/deepinsight/insightface), [ICT](https://github.com/LightDXY/ICT_DeepFake), and [Pix2Word](https://github.com/google-research/composed_image_retrieval).
+
 
 # Citation
 If you find our work useful for your research, please consider citing our paper:

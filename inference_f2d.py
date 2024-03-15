@@ -6,29 +6,12 @@ import cv2
 from torch import nn
 import argparse
 import torchvision
-from skimage import transform as trans
 import face_alignment
 from PIL import Image
 from torch.nn import functional as F
 from src import modules
-
-
-def get_clip_hidden_states(input_ids,text_encoder):
-	output_attentions = text_encoder.text_model.config.output_attentions
-	output_hidden_states = (
-		text_encoder.text_model.config.output_hidden_states
-	)
-	return_dict = text_encoder.text_model.config.use_return_dict
-
-	if input_ids is None:
-		raise ValueError("You have to specify input_ids")
-
-	input_shape = input_ids.size()
-	input_ids = input_ids.view(-1, input_shape[-1])
-
-	hidden_states = text_encoder.text_model.embeddings(input_ids=input_ids, position_ids=None)
-	return hidden_states
-
+from src import utils
+from src.msid import msid_base_patch8_112
 
 
 def main(args):
@@ -39,9 +22,14 @@ def main(args):
 	pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(pipe.scheduler.config)
 
 	img2text = modules.IMG2TEXTwithEXP(384*4,384*4,768)
-	img2text.load_state_dict(torch.load(args.weight,map_location='cpu'))
+	img2text.load_state_dict(torch.load(args.w_map,map_location='cpu'))
 	img2text=img2text.to(device)
 	img2text.eval()
+
+	msid = msid_base_patch8_112(ext_depthes=[2,5,8,11])
+	msid.load_state_dict(torch.load(args.w_msid))
+	msid=msid.to(device)
+	msid.eval()
 
 	identifier='f'
 
@@ -69,10 +57,18 @@ def main(args):
 		).input_ids
 
 
+	#identity encoding
+	detector=face_alignment.FaceAlignment(face_alignment.LandmarksType.TWO_D,flip_input=False,device='cuda' if torch.cuda.is_available() else 'cpu')
+	lmk=np.array(detector.get_landmarks(args.input))[0]
+	img = np.array(Image.open(args.input).convert('RGB'))
 	with torch.no_grad():
-		idvec = torch.tensor(np.load(args.input)).unsqueeze(0).to(device)
+		M=utils.align(lmk)
+		img=utils.warp_img(img,M,(112,112))/255
+		img=torch.tensor(img).permute(2,0,1).unsqueeze(0)
+		img=(img-0.5)/0.5
+		idvec = msid.extract_mlfeat(img.to(device).float(),[2,5,8,11])
 		tokenized_identity_first, tokenized_identity_last = img2text(idvec,exp=None)
-		hidden_states = get_clip_hidden_states(input_ids.to(device),pipe.text_encoder).to(dtype=torch.float32)
+		hidden_states = utils.get_clip_hidden_states(input_ids.to(device),pipe.text_encoder).to(dtype=torch.float32)
 		hidden_states[[0], [pos_id]]=tokenized_identity_first.to(dtype=torch.float32)
 		hidden_states[[0], [pos_id+1]]=tokenized_identity_last.to(dtype=torch.float32)
 		pos_eot = input_ids.to(dtype=torch.int, device=hidden_states.device).argmax(dim=-1)
@@ -94,8 +90,9 @@ def main(args):
 if __name__=='__main__':
 	parser=argparse.ArgumentParser()
 	parser.add_argument('-p',dest='prompt',required=True)
-	parser.add_argument('-i',dest='input',required=True)
-	parser.add_argument('-w',dest='weight',required=True)
+	parser.add_argument('-i',dest='input',required=True,help='path for the input facial image')
+	parser.add_argument('--w_map',required=True,help='weight path for the mapping network')
+	parser.add_argument('--w_msid',required=True,help='weight path for the msid encoder')
 	parser.add_argument('-o',dest='output',required=True)
 	parser.add_argument('-n',dest='n_samples',default=8,type=int)
 	args=parser.parse_args()
