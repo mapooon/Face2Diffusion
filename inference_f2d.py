@@ -12,6 +12,9 @@ from torch.nn import functional as F
 from src import modules
 from src import utils
 from src.msid import msid_base_patch8_112
+from transformers.models.clip.modeling_clip import CLIPTextTransformer,CLIPTextModel
+from src import mod
+
 
 
 def main(args):
@@ -20,6 +23,10 @@ def main(args):
 	pretrained_model_name_or_path="CompVis/stable-diffusion-v1-4"
 	pipe = StableDiffusionPipeline.from_pretrained(pretrained_model_name_or_path, torch_dtype=torch.float16,safety_checker=None).to("cuda")
 	pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(pipe.scheduler.config)
+
+	#build f2d pipeline
+	pipe.text_encoder.text_model.forward = mod.forward_texttransformer.__get__(pipe.text_encoder.text_model, CLIPTextTransformer)
+	pipe.text_encoder.forward = mod.forward_textmodel.__get__(pipe.text_encoder, CLIPTextModel)
 
 	img2text = modules.IMG2TEXTwithEXP(384*4,384*4,768)
 	img2text.load_state_dict(torch.load(args.w_map,map_location='cpu'))

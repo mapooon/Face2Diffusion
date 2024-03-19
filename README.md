@@ -33,10 +33,6 @@ Install some packages
 ```bash
 bash install.sh
 ```
-Overwrite a file for Face2Diffusion's pipeline
-```bash
-cp /workspace/src/modified_scripts/modeling_clip.py /opt/conda/lib/python3.10/site-packages/transformers/models/clip/
-```
 
 ## 2. Download checkpoints
 We provide checkpoints for [mapping network](https://drive.google.com/file/d/1Lf_mwMgme_HVYJCkViGr4TfGOfKw9PhE/view?usp=sharing) and [MSID encoder](https://drive.google.com/file/d/1DjUf-ib612SDDt86TRlsDkHqXTeYx030/view?usp=sharing) and place them to ```checkpoints/```.
