@@ -1,7 +1,7 @@
 # Face2Diffusion (CVPR2024)
 <a href='https://arxiv.org/abs/2403.05094'><img src='https://img.shields.io/badge/ArXiv-PDF-red'></a> &nbsp; 
 <a href='https://mapooon.github.io/Face2DiffusionPage'><img src='https://img.shields.io/badge/Project-Page-Green'></a> &nbsp; 
-[![**face2diffusion_demo**](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mapooon/Face2Diffusion/blob/main/Face2Diffusion_Demo.ipynb) 
+[![**face2diffusion_demo**](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mapooon/Face2Diffusion/blob/master/Face2Diffusion_Demo.ipynb) 
 
 ![Overview](fig/teaser.png)
 The official PyTorch implementation for the following paper:
@@ -15,7 +15,7 @@ The official PyTorch implementation for the following paper:
 2024/03/11 🔥  Released this repository and demo code.  
 
 # Demo on Google Colab
-[![**face2diffusion_demo**](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mapooon/Face2Diffusion/blob/main/Face2Diffusion_Demo.ipynb) 
+[![**face2diffusion_demo**](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mapooon/Face2Diffusion/blob/master/Face2Diffusion_Demo.ipynb) 
 
 # Recomended Development Environment
 * GPU: NVIDIA A100
